@@ -15,7 +15,7 @@ func pushToUser() error {
 	if err != nil {
 		return err
 	}
-	bot.PushMessage(
+	res, err := bot.PushMessage(
 		&messaging_api.PushMessageRequest{
 			To: "annkara",
 			Messages: []messaging_api.MessageInterface{
@@ -26,6 +26,11 @@ func pushToUser() error {
 		},
 		"", // x-line-retry-key
 	)
+	if err != nil {
+		return err
+	}
+
+	slog.Info("Push Message Response", res)
 
 	return nil
 }
