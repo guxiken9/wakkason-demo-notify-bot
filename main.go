@@ -30,7 +30,7 @@ func pushToUser() error {
 		return err
 	}
 
-	slog.Info("Push Message Response", res)
+	slog.Info("Push Message Response", res.SentMessages)
 
 	return nil
 }
