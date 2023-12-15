@@ -5,7 +5,30 @@ import (
 	"os"
 
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/line/line-bot-sdk-go/v8/linebot/messaging_api"
 )
+
+func pushToUser() error {
+	bot, err := messaging_api.NewMessagingApiAPI(
+		os.Getenv("LINE_CHANNEL_TOKEN"),
+	)
+	if err != nil {
+		return err
+	}
+	bot.PushMessage(
+		&messaging_api.PushMessageRequest{
+			To: "annkara",
+			Messages: []messaging_api.MessageInterface{
+				messaging_api.TextMessage{
+					Text: "Test from Lambda",
+				},
+			},
+		},
+		"", // x-line-retry-key
+	)
+
+	return nil
+}
 
 func HandleRequest() (string, error) {
 	slog.Info("Start")
@@ -13,6 +36,10 @@ func HandleRequest() (string, error) {
 	// 投稿するメッセージを取得
 
 	// メッセージ投稿
+	if err := pushToUser(); err != nil {
+		slog.Error("ユーザへの通知にエラーとなりました。", err)
+		return "", err
+	}
 
 	slog.Info("End")
 	return "### success ###", nil
