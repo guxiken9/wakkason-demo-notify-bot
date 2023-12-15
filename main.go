@@ -17,7 +17,7 @@ func pushToUser() error {
 	}
 	res, err := bot.PushMessage(
 		&messaging_api.PushMessageRequest{
-			To: "annkara",
+			To: "U319905930de67669d4d53848cd3325a1",
 			Messages: []messaging_api.MessageInterface{
 				messaging_api.TextMessage{
 					Text: "Test from Lambda",
