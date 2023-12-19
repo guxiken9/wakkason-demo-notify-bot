@@ -6,20 +6,33 @@ import (
 	"github.com/line/line-bot-sdk-go/v8/linebot"
 )
 
-func UnmarshalUser(data []byte) (Message, error) {
-	var r Message
+func UnmarshalFlexMesage(data []byte) (FlexMesage, error) {
+	var r FlexMesage
 	err := json.Unmarshal(data, &r)
 	return r, err
 }
 
-func (r *Message) Marshal() ([]byte, error) {
+func (r *FlexMesage) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
-type Message struct {
+type FlexMesage struct {
 	Type string `json:"type"`
-	H    Hero   `json:"hero"`
-	B    Body   `json:"body"`
+	Hero Hero   `json:"hero"`
+	Body Body   `json:"body"`
+}
+
+type Body struct {
+	Type     string    `json:"type"`
+	Layout   string    `json:"layout"`
+	Contents []Content `json:"contents"`
+}
+
+type Content struct {
+	Type   string `json:"type"`
+	Text   string `json:"text"`
+	Weight string `json:"weight"`
+	Size   string `json:"size"`
 }
 
 type Hero struct {
@@ -30,48 +43,36 @@ type Hero struct {
 	AspectMode  string `json:"aspectMode"`
 }
 
-type Body struct {
-	BodyType string  `json:"type"`
-	Layout   string  `json:"layout"`
-	Contents Content `json:"contents"`
-}
-
-type Content struct {
-	ContentType string `json:"type"`
-	Text        string `json:"text"`
-	Weight      string `json:"weight"`
-	Size        string `json:"size"`
-}
-
-const jsonData1 = `{
-  "type": "bubble",
-  "hero": {
-    "type": "image",
-    "url": `
-const jsonData2 = `,
-    "size": "full",
-    "aspectRatio": "20:13",
-    "aspectMode": "cover"
-  },
-  "body": {
-    "type": "box",
-    "layout": "vertical",
-    "contents": [
-      {
-        "type": "text",
-        "text": `
-const jsonData3 = `,
-        "weight": "bold",
-        "size": "xl"
-      }
-    ]
-  }
-}`
-
 func NewFlex(url, text string) (*linebot.FlexMessage, error) {
 
-	jsonStr := jsonData1 + url + jsonData2 + text + jsonData3
-	container, err := linebot.UnmarshalFlexMessageJSON([]byte(jsonStr))
+	m := FlexMesage{
+		Type: "bubble",
+		Hero: Hero{
+			Type:        "image",
+			URL:         url,
+			Size:        "full",
+			AspectRatio: "20:13",
+			AspectMode:  "cover",
+		},
+		Body: Body{
+			Type:   "box",
+			Layout: "vertical",
+			Contents: []Content{
+				{
+					Type:   "text",
+					Text:   text,
+					Weight: "bold",
+					Size:   "sm",
+				},
+			},
+		},
+	}
+
+	jsonStr, err := m.Marshal()
+	if err != nil {
+		return nil, err
+	}
+	container, err := linebot.UnmarshalFlexMessageJSON(jsonStr)
 	if err != nil {
 		// 正しくUnmarshalできないinvalidなJSONであればerrが返る
 		return nil, err
@@ -79,4 +80,5 @@ func NewFlex(url, text string) (*linebot.FlexMessage, error) {
 	message := linebot.NewFlexMessage("alt text", container)
 
 	return message, nil
+
 }

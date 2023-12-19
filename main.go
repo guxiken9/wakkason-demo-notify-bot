@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/line/line-bot-sdk-go/linebot"
+	"github.com/line/line-bot-sdk-go/v8/linebot"
 )
 
 func pushToUser(message *TiDBMessage) error {
@@ -18,16 +18,11 @@ func pushToUser(message *TiDBMessage) error {
 		return err
 	}
 
-	//m, err := NewFlex(message.PhotoURL, message.Title)
-
-	textMessage := linebot.NewTextMessage(message.Message)
-	imageMessage := linebot.NewImageMessage(message.PhotoURL, message.PhotoURL)
-
-	_, err = bot.PushMessage("U316e79437f87b71ce6d0965e8ab47453", textMessage, imageMessage).Do()
+	m, err := NewFlex(message.PhotoURL, message.Message)
 	if err != nil {
 		return err
 	}
-
+	_, err = bot.PushMessage("U827c7ff11967bd48adf2ab56fd1078f3", m).Do()
 	if err != nil {
 		return err
 	}
