@@ -22,7 +22,7 @@ func pushToUser(message *TiDBMessage) error {
 	if err != nil {
 		return err
 	}
-	_, err = bot.PushMessage("U827c7ff11967bd48adf2ab56fd1078f3", m).Do()
+	_, err = bot.PushMessage("U316e79437f87b71ce6d0965e8ab47453", m).Do()
 	if err != nil {
 		return err
 	}
