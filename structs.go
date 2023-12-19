@@ -4,13 +4,18 @@ import (
 	"encoding/json"
 )
 
-type NotifyRequest struct {
-	MessageID string `json:"messageId"`
-}
-
-// Lambda Function URL のリクエスト
 type LambdaFunctionURLRequest struct {
 	Body string `json:"body"`
+}
+
+func UnmarshalWelcome(data []byte) (LambdaFunctionURLRequest, error) {
+	var r LambdaFunctionURLRequest
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+type NotifyRequest struct {
+	MessageID int `json:"messageId"`
 }
 
 func UnmarshalLambdaRequestBody(data []byte) (NotifyRequest, error) {

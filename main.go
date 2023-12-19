@@ -5,28 +5,29 @@ import (
 	"os"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/line/line-bot-sdk-go/v8/linebot/messaging_api"
+	"github.com/line/line-bot-sdk-go/linebot"
 )
 
 func pushToUser(message *TiDBMessage) error {
-	bot, err := messaging_api.NewMessagingApiAPI(
-		os.Getenv("LINE_CHANNEL_TOKEN"),
+
+	bot, err := linebot.New(
+		os.Getenv("CHANNEL_SECRET"),
+		os.Getenv("CHANNEL_ACCESS_TOKEN"),
 	)
 	if err != nil {
 		return err
 	}
 
-	_, err = bot.PushMessage(
-		&messaging_api.PushMessageRequest{
-			To: "U319905930de67669d4d53848cd3325a1",
-			Messages: []messaging_api.MessageInterface{
-				messaging_api.TextMessage{
-					Text: message.Title,
-				},
-			},
-		},
-		"", // x-line-retry-key
-	)
+	//m, err := NewFlex(message.PhotoURL, message.Title)
+
+	textMessage := linebot.NewTextMessage(message.Message)
+	imageMessage := linebot.NewImageMessage(message.PhotoURL, message.PhotoURL)
+
+	_, err = bot.PushMessage("U316e79437f87b71ce6d0965e8ab47453", textMessage, imageMessage).Do()
+	if err != nil {
+		return err
+	}
+
 	if err != nil {
 		return err
 	}
@@ -37,13 +38,8 @@ func pushToUser(message *TiDBMessage) error {
 func HandleRequest(event LambdaFunctionURLRequest) (string, error) {
 	slog.Info("Start")
 
-	// 投稿するメッセージを取得
-	r, err := UnmarshalLambdaRequestBody([]byte(event.Body))
-	if err != nil {
-		return "", err
-	}
-
-	m, err := FindMessage(r.MessageID)
+	const ID = 30016
+	m, err := FindMessage(ID)
 	if err != nil {
 		slog.Error("ユーザへの通知にエラーとなりました。", err)
 		return "", err
