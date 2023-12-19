@@ -33,7 +33,7 @@ func pushToUser(message *TiDBMessage) error {
 func HandleRequest(event LambdaFunctionURLRequest) (string, error) {
 	slog.Info("Start")
 
-	const ID = 30016
+	const ID = 60001
 	m, err := FindMessage(ID)
 	if err != nil {
 		slog.Error("ユーザへの通知にエラーとなりました。", err)
